@@ -1,0 +1,48 @@
+---
+title: "tp1"
+author: "MartinFeijoo"
+date: "2025-03-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Configuración general
+
+```{r configuracion_gral}
+library(dplyr)
+library(e1071)  
+library(psych) 
+library(readxl) 
+library(knitr)  
+library(tidyr)
+library(writexl)
+library(readr)
+library(dplyr)
+# indica desde dónde instalar paquetes
+options(repos = c(CRAN = "http://cran.rstudio.com")) 
+# Seteo de directorio de trabajo
+setwd("/home/martin/Documents/DataMining/AID/tp1")
+# Muestra directorio de trabajo
+getwd() 
+options(digits = 4)
+```
+
+```{r leo_data, echo=FALSE}
+
+file <- "dirty_cafe_sales.csv"
+cafe_sales_df <- read_csv(file)
+
+```
+
+# 1a Muestro datos
+```{r sel_cols}
+df <- as.data.frame(select(cafe_sales_df, "Item", "Quantity", "Payment Method", "Location"))
+head(df)
+lapply(df, unique)
+```
+
+
+```
