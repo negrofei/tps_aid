@@ -2,16 +2,18 @@
 title: "tp1"
 author: "MartinFeijoo"
 date: "2025-03-30"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true  # Para hacerla flotante (opcional)
+    number_sections: true  # Para numerar las secciones (opcional)
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Configuración general
-
-```{r configuracion_gral}
+```{r configuracion_gral, echo = FALSE, include = FALSE}
 library(dplyr)
 library(e1071)  
 library(psych) 
@@ -21,28 +23,214 @@ library(tidyr)
 library(writexl)
 library(readr)
 library(dplyr)
+library(ggplot2)
 # indica desde dónde instalar paquetes
 options(repos = c(CRAN = "http://cran.rstudio.com")) 
 # Seteo de directorio de trabajo
-setwd("/home/martin/Documents/DataMining/AID/tp1")
+setwd("/home/mfeijoo/Documents/yo/master/aid/tps_aid/tp1")
 # Muestra directorio de trabajo
 getwd() 
 options(digits = 4)
 ```
 
-```{r leo_data, echo=FALSE}
+```{r leo_data, echo=FALSE, include=FALSE}
 
 file <- "dirty_cafe_sales.csv"
 cafe_sales_df <- read_csv(file)
 
 ```
 
-# 1a Muestro datos
+# Parte 1
+## a. Muestro datos
 ```{r sel_cols}
 df <- as.data.frame(select(cafe_sales_df, "Item", "Quantity", "Payment Method", "Location"))
 head(df)
 lapply(df, unique)
 ```
 
+## b. Grafico de frecuencias
+```{r most_freq}
+
+for (col_name in names(df)) {
+  print(col_name)
+  print(table(df[[col_name]]))
+}
+```
+```{r plot_freq}
+for (col_name in names(df)) {
+  if (is.factor(df[[col_name]]) || is.character(df[[col_name]])) {  # Solo columnas categóricas
+    counts <- table(df[[col_name]])
+    ggplot(data = as.data.frame(counts), aes(x = Var1, y = Freq)) +
+      geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+      labs(title = paste("Frecuencia de", col_name), x = "Categoría", y = "Frecuencia") +
+      theme_minimal() -> p  # Guarda el gráfico en una variable
+
+    print(p)  # Muestra el gráfico
+  }
+}
+
+```
+
+## c. Cuántos nulos?
+```{r nan_unknown_error}
+# Crear una función para contar NA, "UNKNOWN" y "ERROR"
+count_values <- function(col, relative = FALSE) {
+  total <- length(col)  # Total de valores en la columna
+  
+  if (is.factor(col) || is.character(col)) {
+    counts <- c(
+      NA_count = sum(is.na(col)), 
+      UNKNOWN_count = sum(col == "UNKNOWN", na.rm = TRUE), 
+      ERROR_count = sum(col == "ERROR", na.rm = TRUE)
+    )
+  } else {
+    counts <- c(
+      NA_count = sum(is.na(col)), 
+      UNKNOWN_count = NA, 
+      ERROR_count = NA
+    )
+  }
+  
+  # Si relative = TRUE, convertir a proporciones
+  if (relative) {
+    counts <- counts / total
+  }
+  
+  return(counts)
+}
+
+
+# Aplicar la función a todas las columnas del data.frame
+result_F <- sapply(df, count_values)
+
+# Convertir a data.frame para mejor visualización
+result_df <- as.data.frame(t(result_F))
+print(result_df)
+
+
+```
+
+## Análisis
+Las columnas `Item`, `Quantity`, `Payment Method` y `Location` tienen una distribución uniforme, a excepción de los valores `UNKNOWN` y `ERROR`. 
+El `Item` más frecuente de la tabla es `Juice`, la `Quantity` menos frecuente es `1`, `2258` personas pagaron en `Cash`, la cantidad de `NA`, `UNKNOWN` y `ERROR` para location son, respectivamente, `3265`, `338` y `358`.  
+Ahora veo `Price per Unit`:  
+
+```{r price_per_unit, echo=FALSE}
+# Agarro price per unit como dataframe
+price_per_unit <- as.data.frame(select(cafe_sales_df, "Price Per Unit"))
+
+# Suponiendo que la columna se llama "columna"
+price_per_unit$`Price Per Unit` <- suppressWarnings(as.numeric(price_per_unit$`Price Per Unit`))
+
+# Eliminar valores NA que corresponden a strings no convertibles
+price_per_unit <- price_per_unit[!is.na(price_per_unit$`Price Per Unit`), , drop = TRUE]
+```
+
+```{r stats_price_x_unit}
+print(paste("Media", mean(price_per_unit)))
+print(paste("Mediana", median(price_per_unit)))
+print(paste("STD", sd(price_per_unit)))
+```
+
+# Parte 2
+## a. Outliers
+No tiene sentido que me fije outliers en `Transaction ID` y `Transaction Date`.
+Además en `Item`, `Quantity`, `Payment Method` y `Location` ya me fijé antes viendo las frecuencias, ya que son variables categóricas. Voy a ver el resto  
+
+```{r total_spent, echo = FALSE}
+# Agarro total_spent como dataframe
+total_spent <- as.data.frame(select(cafe_sales_df, "Total Spent"))
+
+total_spent$`Total Spent` <- suppressWarnings(as.numeric(total_spent$`Total Spent`))
+
+# Eliminar valores NA que corresponden a strings no convertibles
+total_spent <- total_spent[!is.na(total_spent$`Total Spent`), , drop = TRUE]
+``` 
+
+```{r select_numerics}
+# Selecciono las columnas
+df <- as.data.frame(select(cafe_sales_df, "Price Per Unit", "Total Spent"))
+
+# Lo convierto a numeros
+df <- df %>% mutate_all(~ suppressWarnings(as.numeric(.)))
+
+# Le saco los nans
+df <- na.omit(df)
+```
+
+```{r veo_outliers}
+# Convertir a formato largo (long format)
+df_long <- pivot_longer(df, cols = everything(), names_to = "Variable", values_to = "Valor")
+
+# Boxplot de ambas columnas
+ggplot(df_long, aes(x = Variable, y = Valor, fill = Variable)) +
+  geom_boxplot(outlier.color = "red", outlier.size = 2) +
+  labs(title = "Boxplot", x = "Variable", y = "Valor") +
+  theme_minimal()
+
+Q1 <- quantile(total_spent, 0.25, na.rm = TRUE)
+Q3 <- quantile(total_spent, 0.75, na.rm = TRUE)
+IQR <- Q3 - Q1
+lower_bound <- Q1 - 1.5 * IQR
+upper_bound <- Q3 + 1.5 * IQR
+```
+Viendo el boxplot de `Total Spent` muestra que tenemos un valor de 25, muy por encima de 1.5 veces el IQR
+(\( 1.5 \cdot IQR = 1.5 \cdot `r IQR` = `r upper_bound` \))
+
+## b. Transaction Date
+
+```{r char2date, echo = TRUE}
+
+# Supongamos que tu columna se llama "Transaction Date" en el dataframe "df"
+cafe_sales_df$`Transaction Date` <- as.Date(cafe_sales_df$`Transaction Date`, format = "%Y-%m-%d")   
+
+# Crear nueva columna "dia_de_semana"
+cafe_sales_df$dia_de_semana <- format(cafe_sales_df$`Transaction Date`, "%A")
+
+cafe_sales_df$dia_de_semana <- factor(
+  cafe_sales_df$dia_de_semana, levels = c("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")
+)
+
+``` 
+ 
+```{r groupby_dia_semana}
+# transacciones por día de la semana
+transacciones_x_dia <- cafe_sales_df %>%
+  group_by(dia_de_semana) %>%
+  summarise(total_transacciones = n()) %>%  # n() calcula el numero de filas
+  arrange(dia_de_semana) # ordeno por total de transaciones
+
+print(transacciones_x_dia)
+
+ggplot(data = as.data.frame(transacciones_x_dia), aes(x = dia_de_semana, y = total_transacciones)) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+  labs(title = "Transacciones por semana", x = "Dia", y = "Transacciones") +
+  theme_minimal()  # Guarda el gráfico en una variable
+
+```
+  
+Con esta información vemos que la cantidad de transacciones por día es homogénea, con minimo los martes y máximo los viernes.  
+Vamos a ver la serie mensual
+
+```{r analisis_mensual}
+# Crear nueva columna "mes"
+cafe_sales_df$mes <- format(cafe_sales_df$`Transaction Date`, "%B")
+
+cafe_sales_df$mes <- factor(
+  cafe_sales_df$mes, levels = c("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre")
+)
+
+# transacciones por mes
+transacciones_x_mes <- cafe_sales_df %>%
+  group_by(mes) %>%
+  summarise(total_transacciones = n()) %>%  # n() calcula el numero de filas
+  arrange(total_transacciones) # ordeno por total de transaciones
+
+print(transacciones_x_mes)
+
+ggplot(data = as.data.frame(transacciones_x_mes), aes(x = mes, y = total_transacciones)) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+  labs(title = "Transacciones por mes", x = "Mes", y = "Transacciones") +
+  theme_minimal()  # Guarda el gráfico en una variable
 
 ```
