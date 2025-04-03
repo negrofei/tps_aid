@@ -37,15 +37,18 @@ options(digits = 4)
 
 file <- "dirty_cafe_sales.csv"
 cafe_sales_df <- read_csv(file)
-
+head(cafe_sales_df, 20)
 ```
 
 # Parte 1
 ## a. Muestro datos
 ```{r sel_cols}
 df <- as.data.frame(select(cafe_sales_df, "Item", "Quantity", "Payment Method", "Location"))
-head(df)
+head(df, 20)
 lapply(df, unique)
+
+# df <- select(cafe_sales_df, "Item", "Quantity", "Payment Method", "Location")
+# head(df, 20)
 ```
 
 ## b. Grafico de frecuencias
@@ -232,5 +235,81 @@ ggplot(data = as.data.frame(transacciones_x_mes), aes(x = mes, y = total_transac
   geom_bar(stat = "identity", fill = "skyblue", color = "black") +
   labs(title = "Transacciones por mes", x = "Mes", y = "Transacciones") +
   theme_minimal()  # Guarda el gráfico en una variable
+
+```
+No se observa una tendencia clara. El mes con menos transacciones es febrero y el que más octubre, pero no se observa una evolución mes a mes, si no más bien una distribución uniforme de la cantidad de transacciones.
+
+# Parte 3 - Completar y corregir
+## Completo `Price Per Unit` con el menú dado
+``` {r menu_dado} 
+menu_df <- data.frame(
+  Item = c("Cake", "Juice", "Coffee", "Cookie", "Salad", "Sandwich", "Smoothie", "Tea"),
+  Price_Per_Unit = c(3, 3, 2, 1, 5, 4, 4, 2)
+)
+```
+``` {r corrijo_price_per_unit}
+cafe_sales_df <- cafe_sales_df %>%
+  mutate(`Price Per Unit` = case_when(  # aplico condiciones
+    Item %in% c(NA, "ERROR", "UNKNOWN") ~ NA_real_,  # Si el Item es NA, ERROR o UNKNOWN, deja NA
+    `Price Per Unit` %in% c(NA, "ERROR", "UNKNOWN") ~ menu_df$Price_Per_Unit[match(Item, menu_df$Item)], # Si el precio es NA, ERROR o UNKNOWN, asigna el del menú
+    TRUE ~ as.numeric(`Price Per Unit`) # Mantiene los valores correctos
+  ))
+```
+## Completo la `Quantity`, `Price Per Unit` y `Total Spent`
+``` {r cuento_Nans}
+
+cafe_sales_df <- cafe_sales_df %>%
+  mutate(
+    Quantity = as.numeric(Quantity),    
+    `Price Per Unit` = as.numeric(`Price Per Unit`),
+    `Total Spent` = as.numeric(`Total Spent`)
+  )
+    
+cafe_sales_df$countNans <- rowSums(is.na(cafe_sales_df[, c("Quantity", "Price Per Unit", "Total Spent")]))
+```
+
+``` {r me_guardo_para_chequear}
+df_1_nans <- cafe_sales_df %>%
+  filter(countNans == 1)
+```
+
+``` {r corrijo_columnas}
+cafe_sales_df <- cafe_sales_df %>%
+  mutate(
+    `Total Spent` = ifelse(countNans == 1 & is.na(`Total Spent`) & !is.na(Quantity) & !is.na(`Price Per Unit`),
+                           Quantity * `Price Per Unit`, `Total Spent`),
+    
+    Quantity = ifelse(countNans == 1 & is.na(Quantity) & !is.na(`Total Spent`) & !is.na(`Price Per Unit`),
+                      `Total Spent` / `Price Per Unit`, Quantity),
+    
+    `Price Per Unit` = ifelse(countNans == 1 & is.na(`Price Per Unit`) & !is.na(`Total Spent`) & !is.na(Quantity),
+                              `Total Spent` / Quantity, `Price Per Unit`)
+  )
+```
+## Completo `Item` desde `Price Per Unit`
+``` {r corrijo_item}
+cafe_sales_df <- cafe_sales_df %>%
+  mutate(
+    Item = case_when(
+      (is.na(Item) | Item %in% c("UNKNOWN", "ERROR")) & `Price Per Unit` == 1 ~ "Cookie",
+      (is.na(Item) | Item %in% c("UNKNOWN", "ERROR")) & `Price Per Unit` == 3 ~ "Cake",
+      (is.na(Item) | Item %in% c("UNKNOWN", "ERROR")) & `Price Per Unit` == 4 ~ "Sandwich",
+      (is.na(Item) | Item %in% c("UNKNOWN", "ERROR")) & `Price Per Unit` == 5 ~ "Salad",
+      
+      TRUE ~ Item # Mantener el valor original si no se cumple ninguna condición
+    )
+  )
+
+```
+## Verifico
+``` {r cuento nans}
+contar_na <- function(df, columna) {
+  sum(is.na(df[[columna]]))
+}
+
+contar_na(cafe_sales_df, "Item")
+contar_na(cafe_sales_df, "Price Per Unit")
+contar_na(cafe_sales_df, "Quantity")
+contar_na(cafe_sales_df, "Total Spent")
 
 ```
