@@ -40,18 +40,16 @@ cafe_sales_df <- read_csv(file)
 head(cafe_sales_df, 20)
 ```
 
-# Parte 1
-## a. Muestro datos
+#  Análisis Exploratorio Inicial
+## Muestro los valores de cada columna
 ```{r sel_cols}
 df <- as.data.frame(select(cafe_sales_df, "Item", "Quantity", "Payment Method", "Location"))
 head(df, 20)
 lapply(df, unique)
 
-# df <- select(cafe_sales_df, "Item", "Quantity", "Payment Method", "Location")
-# head(df, 20)
 ```
 
-## b. Grafico de frecuencias
+## Veo los valores más frecuentes
 ```{r most_freq}
 
 for (col_name in names(df)) {
@@ -74,7 +72,7 @@ for (col_name in names(df)) {
 
 ```
 
-## c. Cuántos nulos?
+## Cuántos nulos?
 ```{r nan_unknown_error}
 # Crear una función para contar NA, "UNKNOWN" y "ERROR"
 count_values <- function(col, relative = FALSE) {
@@ -135,8 +133,8 @@ print(paste("Mediana", median(price_per_unit)))
 print(paste("STD", sd(price_per_unit)))
 ```
 
-# Parte 2
-## a. Outliers
+# Análisis de Outliers y Patrones Temporales
+## Outliers
 No tiene sentido que me fije outliers en `Transaction ID` y `Transaction Date`.
 Además en `Item`, `Quantity`, `Payment Method` y `Location` ya me fijé antes viendo las frecuencias, ya que son variables categóricas. Voy a ver el resto  
 
@@ -180,7 +178,7 @@ upper_bound <- Q3 + 1.5 * IQR
 Viendo el boxplot de `Total Spent` muestra que tenemos un valor de 25, muy por encima de 1.5 veces el IQR
 (\( 1.5 \cdot IQR = 1.5 \cdot `r IQR` = `r upper_bound` \))
 
-## b. Transaction Date
+## Analizo `Transaction Date`
 
 ```{r char2date, echo = TRUE}
 
@@ -234,12 +232,14 @@ print(transacciones_x_mes)
 ggplot(data = as.data.frame(transacciones_x_mes), aes(x = mes, y = total_transacciones)) +
   geom_bar(stat = "identity", fill = "skyblue", color = "black") +
   labs(title = "Transacciones por mes", x = "Mes", y = "Transacciones") +
-  theme_minimal()  # Guarda el gráfico en una variable
+  theme_minimal() + # Guarda el gráfico en una variable
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+   
 No se observa una tendencia clara. El mes con menos transacciones es febrero y el que más octubre, pero no se observa una evolución mes a mes, si no más bien una distribución uniforme de la cantidad de transacciones.
 
-# Parte 3 - Completar y corregir
+# Completar y corregir
 ## Completo `Price Per Unit` con el menú dado
 ``` {r menu_dado} 
 menu_df <- data.frame(
@@ -250,8 +250,13 @@ menu_df <- data.frame(
 ``` {r corrijo_price_per_unit}
 cafe_sales_df <- cafe_sales_df %>%
   mutate(`Price Per Unit` = case_when(  # aplico condiciones
-    Item %in% c(NA, "ERROR", "UNKNOWN") ~ NA_real_,  # Si el Item es NA, ERROR o UNKNOWN, deja NA
-    `Price Per Unit` %in% c(NA, "ERROR", "UNKNOWN") ~ menu_df$Price_Per_Unit[match(Item, menu_df$Item)], # Si el precio es NA, ERROR o UNKNOWN, asigna el del menú
+    # Si Price Per Unit es inválido Y el Item también es inválido → NA
+    `Price Per Unit` %in% c(NA, "ERROR", "UNKNOWN") &
+      (is.na(Item) | Item %in% c("ERROR", "UNKNOWN")) ~ NA_real_,    
+    # Si Price Per unit es inválido pero tengo Item
+    `Price Per Unit` %in% c(NA, "ERROR", "UNKNOWN") &
+      !(is.na(Item) | Item %in% c("ERROR", "UNKNOWN")) ~ menu_df$Price_Per_Unit[match(Item, menu_df$Item)], 
+    # si está bien lo hago numerico
     TRUE ~ as.numeric(`Price Per Unit`) # Mantiene los valores correctos
   ))
 ```
@@ -312,4 +317,59 @@ contar_na(cafe_sales_df, "Price Per Unit")
 contar_na(cafe_sales_df, "Quantity")
 contar_na(cafe_sales_df, "Total Spent")
 
+```
+Bueno considero que esto es incluso mejor que lo que piden así que sigo.   
+
+## Relleno columnas usando la moda
+
+``` {r relleno_columnas}
+# Función para calcular la moda, excluyendo NA, "ERROR" y "UNKNOWN"
+calcular_moda <- function(col) {
+  col_filtrado <- col[!is.na(col) & col != "ERROR" & col != "UNKNOWN"]
+  if (length(col_filtrado) == 0) {
+    return(NA)  # Si no hay datos válidos
+  }
+  unicos <- unique(col_filtrado)
+  moda <- unicos[which.max(tabulate(match(col_filtrado, unicos)))]
+  return(moda)
+}
+
+# Reemplazar valores en las columnas deseadas
+columnas_a_rellenar <- c("Item", "Price Per Unit", "Quantity", "Total Spent", "Payment Method", "Location")
+
+# Aplicar la moda a cada columna y reemplazar valores anómalos
+for (col in columnas_a_rellenar) {
+  moda_col <- calcular_moda(cafe_sales_df[[col]])
+  
+  cafe_sales_df[[col]] <- ifelse(
+    is.na(cafe_sales_df[[col]]) | cafe_sales_df[[col]] == "ERROR" | cafe_sales_df[[col]] == "UNKNOWN",
+    moda_col,
+    cafe_sales_df[[col]]
+  )
+}
+```
+
+Para `Transaction Date` rellenar con la moda no tiene sentido. Pero bueno lo voy a hacer igual porque los Transaction ID no están en orden ... 
+
+``` {r transaction_dte}
+# LEvanto de nuevo los datos para que esten en formato "CHAR"
+temp_df <- read_csv(file)
+moda_transaction_dates <- calcular_moda(temp_df$`Transaction Date`)
+cafe_sales_df$`Transaction Date` <- temp_df$`Transaction Date`
+cafe_sales_df[["Transaction Date"]] <- ifelse(
+  is.na(cafe_sales_df[["Transaction Date"]]) | cafe_sales_df[["Transaction Date"]] == "ERROR" | cafe_sales_df[["Transaction Date"]] == "UNKNOWN",
+  moda_transaction_dates,
+  cafe_sales_df[["Transaction Date"]]
+)
+
+
+```
+``` {r askdasd}
+# Le saco las columnas de los días que tienen nan todavía
+cafe_sales_df <- cafe_sales_df %>%
+  select(-dia_de_semana, -mes)
+
+print(cafe_sales_df %>%
+  filter(if_any(everything(), is.na))
+)
 ```
