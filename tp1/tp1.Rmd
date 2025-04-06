@@ -1,7 +1,7 @@
 ---
-title: "tp1"
+title: "TP1"
 author: "MartinFeijoo"
-date: "2025-03-30"
+date: "2025-04-06"
 output:
   html_document:
     toc: true
@@ -27,7 +27,8 @@ library(ggplot2)
 # indica desde dónde instalar paquetes
 options(repos = c(CRAN = "http://cran.rstudio.com")) 
 # Seteo de directorio de trabajo
-setwd("/home/mfeijoo/Documents/yo/master/aid/tps_aid/tp1")
+# setwd("/home/mfeijoo/Documents/yo/master/aid/tps_aid/tp1")
+setwd("/home/martin/Documents/DataMining/AID/tp1")
 # Muestra directorio de trabajo
 getwd() 
 options(digits = 4)
@@ -45,7 +46,6 @@ head(cafe_sales_df, 20)
 ```{r sel_cols}
 df <- as.data.frame(select(cafe_sales_df, "Item", "Quantity", "Payment Method", "Location"))
 head(df, 20)
-lapply(df, unique)
 
 ```
 
@@ -58,23 +58,22 @@ for (col_name in names(df)) {
 }
 ```
 ```{r plot_freq}
+# Grafico las frecuencias
 for (col_name in names(df)) {
-  if (is.factor(df[[col_name]]) || is.character(df[[col_name]])) {  # Solo columnas categóricas
-    counts <- table(df[[col_name]])
-    ggplot(data = as.data.frame(counts), aes(x = Var1, y = Freq)) +
+    freqs <- table(df[[col_name]])
+    ggplot(data = as.data.frame(freqs), aes(x = Var1, y = Freq)) +
       geom_bar(stat = "identity", fill = "skyblue", color = "black") +
       labs(title = paste("Frecuencia de", col_name), x = "Categoría", y = "Frecuencia") +
       theme_minimal() -> p  # Guarda el gráfico en una variable
 
     print(p)  # Muestra el gráfico
   }
-}
 
 ```
 
 ## Cuántos nulos?
 ```{r nan_unknown_error}
-# Crear una función para contar NA, "UNKNOWN" y "ERROR"
+# Hago una función para contar NA, "UNKNOWN" y "ERROR"
 count_values <- function(col, relative = FALSE) {
   total <- length(col)  # Total de valores en la columna
   
@@ -92,7 +91,7 @@ count_values <- function(col, relative = FALSE) {
     )
   }
   
-  # Si relative = TRUE, convertir a proporciones
+  # Si relative = TRUE, convierte a proporciones
   if (relative) {
     counts <- counts / total
   }
@@ -101,29 +100,27 @@ count_values <- function(col, relative = FALSE) {
 }
 
 
-# Aplicar la función a todas las columnas del data.frame
+# Aplico la función a todas las columnas del data.frame
 result_F <- sapply(df, count_values)
 
-# Convertir a data.frame para mejor visualización
-result_df <- as.data.frame(t(result_F))
-print(result_df)
+
+print(as.data.frame(t(result_F)))
 
 
 ```
 
 ## Análisis
-Las columnas `Item`, `Quantity`, `Payment Method` y `Location` tienen una distribución uniforme, a excepción de los valores `UNKNOWN` y `ERROR`. 
+Las columnas `Item`, `Quantity`, `Payment Method` y `Location` parecen tener una distribución uniforme, a excepción de los valores `UNKNOWN` y `ERROR`. 
 El `Item` más frecuente de la tabla es `Juice`, la `Quantity` menos frecuente es `1`, `2258` personas pagaron en `Cash`, la cantidad de `NA`, `UNKNOWN` y `ERROR` para location son, respectivamente, `3265`, `338` y `358`.  
 Ahora veo `Price per Unit`:  
 
-```{r price_per_unit, echo=FALSE}
+```{r price_per_unit, echo=TRUE}
 # Agarro price per unit como dataframe
 price_per_unit <- as.data.frame(select(cafe_sales_df, "Price Per Unit"))
 
-# Suponiendo que la columna se llama "columna"
-price_per_unit$`Price Per Unit` <- suppressWarnings(as.numeric(price_per_unit$`Price Per Unit`))
-
-# Eliminar valores NA que corresponden a strings no convertibles
+# Fuerzo a convertir a número
+price_per_unit$`Price Per Unit` <- as.numeric(price_per_unit$`Price Per Unit`)
+# Limpio los Nan
 price_per_unit <- price_per_unit[!is.na(price_per_unit$`Price Per Unit`), , drop = TRUE]
 ```
 
@@ -175,17 +172,17 @@ IQR <- Q3 - Q1
 lower_bound <- Q1 - 1.5 * IQR
 upper_bound <- Q3 + 1.5 * IQR
 ```
-Viendo el boxplot de `Total Spent` muestra que tenemos un valor de 25, muy por encima de 1.5 veces el IQR
+Viendo el boxplot de `Total Spent` muestra que tenemos un valor de 25, por encima de 1.5 veces el IQR
 (\( 1.5 \cdot IQR = 1.5 \cdot `r IQR` = `r upper_bound` \))
 
 ## Analizo `Transaction Date`
 
 ```{r char2date, echo = TRUE}
 
-# Supongamos que tu columna se llama "Transaction Date" en el dataframe "df"
+# Paso transaction date a date 
 cafe_sales_df$`Transaction Date` <- as.Date(cafe_sales_df$`Transaction Date`, format = "%Y-%m-%d")   
 
-# Crear nueva columna "dia_de_semana"
+# Armo nueva columna "dia_de_semana"
 cafe_sales_df$dia_de_semana <- format(cafe_sales_df$`Transaction Date`, "%A")
 
 cafe_sales_df$dia_de_semana <- factor(
@@ -199,14 +196,14 @@ cafe_sales_df$dia_de_semana <- factor(
 transacciones_x_dia <- cafe_sales_df %>%
   group_by(dia_de_semana) %>%
   summarise(total_transacciones = n()) %>%  # n() calcula el numero de filas
-  arrange(dia_de_semana) # ordeno por total de transaciones
+  arrange(dia_de_semana) # ordeno por dia de semana
 
 print(transacciones_x_dia)
 
 ggplot(data = as.data.frame(transacciones_x_dia), aes(x = dia_de_semana, y = total_transacciones)) +
   geom_bar(stat = "identity", fill = "skyblue", color = "black") +
-  labs(title = "Transacciones por semana", x = "Dia", y = "Transacciones") +
-  theme_minimal()  # Guarda el gráfico en una variable
+  labs(title = "Transacciones por Día", x = "Dia", y = "Transacciones") +
+  theme_minimal()
 
 ```
   
@@ -257,12 +254,12 @@ cafe_sales_df <- cafe_sales_df %>%
     `Price Per Unit` %in% c(NA, "ERROR", "UNKNOWN") &
       !(is.na(Item) | Item %in% c("ERROR", "UNKNOWN")) ~ menu_df$Price_Per_Unit[match(Item, menu_df$Item)], 
     # si está bien lo hago numerico
-    TRUE ~ as.numeric(`Price Per Unit`) # Mantiene los valores correctos
+    TRUE ~ as.numeric(`Price Per Unit`) 
   ))
 ```
 ## Completo la `Quantity`, `Price Per Unit` y `Total Spent`
-``` {r cuento_Nans}
-
+``` {r cuento_Nans, echo=FALSE}
+# Paso a numericos
 cafe_sales_df <- cafe_sales_df %>%
   mutate(
     Quantity = as.numeric(Quantity),    
@@ -270,15 +267,18 @@ cafe_sales_df <- cafe_sales_df %>%
     `Total Spent` = as.numeric(`Total Spent`)
   )
     
+# Cuento cantidad de Nans
 cafe_sales_df$countNans <- rowSums(is.na(cafe_sales_df[, c("Quantity", "Price Per Unit", "Total Spent")]))
 ```
 
 ``` {r me_guardo_para_chequear}
+# Me quedo con las filas que le falta solo 1 dato
 df_1_nans <- cafe_sales_df %>%
   filter(countNans == 1)
 ```
 
 ``` {r corrijo_columnas}
+# Corrijo las que le falten un solo dato
 cafe_sales_df <- cafe_sales_df %>%
   mutate(
     `Total Spent` = ifelse(countNans == 1 & is.na(`Total Spent`) & !is.na(Quantity) & !is.na(`Price Per Unit`),
@@ -293,6 +293,8 @@ cafe_sales_df <- cafe_sales_df %>%
 ```
 ## Completo `Item` desde `Price Per Unit`
 ``` {r corrijo_item}
+
+# Corrijo los items faltantes con el precio del menu
 cafe_sales_df <- cafe_sales_df %>%
   mutate(
     Item = case_when(
@@ -301,7 +303,7 @@ cafe_sales_df <- cafe_sales_df %>%
       (is.na(Item) | Item %in% c("UNKNOWN", "ERROR")) & `Price Per Unit` == 4 ~ "Sandwich",
       (is.na(Item) | Item %in% c("UNKNOWN", "ERROR")) & `Price Per Unit` == 5 ~ "Salad",
       
-      TRUE ~ Item # Mantener el valor original si no se cumple ninguna condición
+      TRUE ~ Item
     )
   )
 
