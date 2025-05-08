@@ -14,6 +14,7 @@ format:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(ggfortify)
 library(ggrepel)
 library(gsheet)
 library(rgl)
@@ -47,7 +48,7 @@ Aplicar el Análisis de Componentes Principales (PCA) para reducir la dimensiona
 ### Analice la presencia de valores faltantes y datos duplicados.
 
 A ver qué tengo
-```{r analisis}
+```{r analisis, echo=FALSE, include=FALSE}
 summary(sample)
 ```
 ``` {r haynans}
@@ -95,18 +96,149 @@ redundantes
 
 ``` 
 
+``` {r saco_variables_redundantes}
+library(caret)
+cor_matrix <- cor(numericas, use = "complete.obs")
+redundant_vars <- findCorrelation(cor_matrix, cutoff = 0.9)
+numericas_reducido <- numericas[, -redundant_vars]
+```
+Buenos las que tiro van a ser 
+`ball_control` `dribbling`  `short_pass`  `att_position` `long_shots` `gk_diving` `gk_reflexes`  `gk_handling`  `gk_positioning` `acceleration` `interceptions` `slide_tackle`
+
+``` {r aver_estas, fig.height=8, fig.width=12}
+m_cor <- cor(numericas_reducido) 
+
+# representa la matriz de correlaciones mediante círculos
+corrplot(m_cor,
+         method="circle",
+         type = "upper",
+         diag= FALSE) 
+```
+### Realice una descripción de las variables numéricas seleccionadas.
+``` {r desc}
+# las columnas estas las escalo con la normal
+cols_standard <- c("age", "weight", "height")
+
+fisico_std <- scale(numericas_reducido[, cols_standard])
+
+# para el resto tomo min max porque van de 0 a 100
+cols_minmax <- setdiff(names(numericas_reducido), cols_standard)
+skills_std <- numericas_reducido[, cols_minmax] %>%
+  mutate(across(everything(), ~ (. - min(.)) / (max(.) - min(.))))
+
+# Convertir a data frame largo
+fisico_long <- as.data.frame(fisico_std) %>%
+  pivot_longer(cols = everything(), names_to = "variable", values_to = "valor")
+
+# Boxplot
+ggplot(fisico_long, aes(x = variable, y = valor)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+skills_long <- skills_std %>%
+  pivot_longer(cols = everything(), names_to = "variable", values_to = "valor")
+
+ggplot(skills_long, aes(x = variable, y = valor)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(title = "Skills") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-3- Realice una descripción de las variables numéricas seleccionadas.
+```
+Bueno las variables físicas (`age`, `height` y `weight`) relativamente normales, aunque hay algunos outliers sobre todo en cuanto al peso de los jugadores.  
+Las variables de habilidad están escaladas MinMax porque van de 0 a 100.  En general hay algunas habilidades en la que hay algunos outliers de jugadores malos (por ejemplo `agility`, `stamina`), 
+mientras que otras tiene outliers por jugadores buenos, como `composure`. Esto ultimo para el caso de `gk_kicking` es notorio, porque la mayoria no son arqueros. 
 
-4- ¿Se estandarizaron las variables? Justifique.
 
 # PCA e interpretación.
 
-5- Realice el PCA sobre las variables seleccionadas. ¿Con cuantas componentes decide quedarse luego de la reduccion de dimensionalidad? 
+### Realice el PCA sobre las variables seleccionadas. ¿Con cuantas componentes decide quedarse luego de la reduccion de dimensionalidad? 
 
-6- Interprete las cargas factoriales de las primeras dos componentes principales. ¿Qué atributos de los jugadores están más representados en cada componente? Mostrar el biplot del PCA realizado.
+Combino los datos de habilidad y físico y uso matriz de correlación
 
-7- Identifique si hay agrupamientos naturales de jugadores en función de las características seleccionadas. Interprete y concluya.
+``` {r cor_mat}
+pca <- prcomp(numericas_reducido,
+              scale = TRUE)
 
-8- Elegir una técnica de PCA robusto y aplicarla sobre la base de datos. Compare los resultados con los obtenidos anteriormente. Concluir.
+round(pca$rotation,2) |> knitr::kable(format = "html") |> 
+  kable_styling() 
+```
+
+Para ver con cuantas me quedo voy a ver primero la varianza explicada
+
+``` {r varianza_explicada}
+prop_varianza <- pca$sdev^2 / sum(pca$sdev^2)
+prop_varianza_acum <- cumsum(prop_varianza)
+ggplot(data = data.frame(prop_varianza_acum, pc = 1:24),
+       aes(x = pc, y = prop_varianza_acum, group = 1)) +
+  geom_point() +
+  geom_line() +
+  theme_bw() +
+  labs(x = "Componente principal",
+       y = "Prop. varianza explicada acumulada") +
+  scale_y_continuous(breaks = seq(0, 1, 0.1))
+
+```
+Bueno con las primeras 4 componentes tengo más del 80% de varianza explicada, no está mal.  Además si me quedo con las primeras 4 cumplo el criterio de Kaiser ($\lambda_4 = 1.12, \lambda_5 = 0.99$).  
+
+### Interprete las cargas factoriales de las primeras dos componentes principales. ¿Qué atributos de los jugadores están más representados en cada componente? Mostrar el biplot del PCA realizado.
+``` {r cargas, fig.width=15, fig.height=10}
+# Crear data frame con ambas cargas y pasar a formato largo
+cargas_long <- data.frame(
+  variable = colnames(numericas_reducido),
+  PC1 = pca$rotation[, 1],
+  PC2 = pca$rotation[, 2]
+) %>%
+  pivot_longer(cols = c(PC1, PC2), names_to = "componente", values_to = "carga")
+
+# Gráfico de barras comparando PC1 y PC2
+ggplot(cargas_long, aes(x = variable, y = carga, fill = componente)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.6) +
+  scale_fill_manual(values = c("PC1" = "royalblue", "PC2" = "tomato")) +
+  xlab("Variables") + ylab("Carga") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+Como se ve en el diagrama, la PC1 tiene contribución parecida de todas las habilidades. Las que menos contribuyen a la componente 1 son las que tienen que ver con las características físicas, estas son, `age`, `strenght`, `jumping` y luego en menor medida `weight` y `height`. Estos atributos de hecho son los que contribuyen mayormente a la componente 2.   
+Pareciera ser que la componente 1 está compuesta más por los skills que por los aspectos físicos y para la componente 2 es lo opuesto. 
+
+``` {r biplot}
+autoplot(pca, 
+         data = numericas_reducido, 
+         loadings = TRUE, 
+         loadings.colour = 'lightblue',
+         loadings.label = TRUE, 
+         loadings.label.size = 5)
+```
+Aca podemos ver un poco más de lo que veníamos destacando, pero agregando que la dirección entre `strength` y `height`-`weight` no son las mismas. 
+Es decir, si bien contribuyen poco a la componente 1 y más a la 2, contribuyen de distinta manera.  
+
+### Identifique si hay agrupamientos naturales de jugadores en función de las características seleccionadas. Interprete y concluya.
+Siguiendo con el biplot podemos ver que el agrupamiento natural más relevante es si es arquero o no, segun u habilidad `gk_kicking`.  
+Quizá también podemos identificar un agrupamiento por Alturay peso.
+
+
+### Elegir una técnica de PCA robusto y aplicarla sobre la base de datos. Compare los resultados con los obtenidos anteriormente. Concluir.
+
+``` {r}
+pca_mcd <-princomp(numericas_reducido, 
+                   cor=TRUE,
+                   scores=TRUE,
+                   covmat=MASS::cov.mcd(numericas_reducido))#se especifica MCD
+``` 
+``` {r}
+library(ggpubr)
+library(factoextra)
+par(mfrow=c(2,1))
+p1 <-fviz_eig(pca_mcd, ncp =5, addlabels = TRUE, main="MCD")
+p2<- fviz_eig(pca, ncp =5, addlabels = TRUE, main="No Robusto")
+
+ggarrange(p1,p2, nrow = 1, ncol = 2)
+```
+
+Esto parece indicar que las componentes se reparten un poco más la variabilidad que la no robusta.  
+

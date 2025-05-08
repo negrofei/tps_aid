@@ -68,7 +68,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="tp_pca_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="tp_pca_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="tp_pca_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="tp_pca_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="tp_pca_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -85,8 +116,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#analice-la-presencia-de-valores-faltantes-y-datos-duplicados." id="toc-analice-la-presencia-de-valores-faltantes-y-datos-duplicados." class="nav-link" data-scroll-target="#analice-la-presencia-de-valores-faltantes-y-datos-duplicados.">Analice la presencia de valores faltantes y datos duplicados.</a></li>
   <li><a href="#seleccione-un-subconjunto-de-variables-relevantes-para-realizar-el-pca.-justifique-la-selección." id="toc-seleccione-un-subconjunto-de-variables-relevantes-para-realizar-el-pca.-justifique-la-selección." class="nav-link" data-scroll-target="#seleccione-un-subconjunto-de-variables-relevantes-para-realizar-el-pca.-justifique-la-selección.">Seleccione un subconjunto de variables relevantes para realizar el PCA. Justifique la selección.</a></li>
+  <li><a href="#realice-una-descripción-de-las-variables-numéricas-seleccionadas." id="toc-realice-una-descripción-de-las-variables-numéricas-seleccionadas." class="nav-link" data-scroll-target="#realice-una-descripción-de-las-variables-numéricas-seleccionadas.">Realice una descripción de las variables numéricas seleccionadas.</a></li>
   </ul></li>
-  <li><a href="#pca-e-interpretación." id="toc-pca-e-interpretación." class="nav-link" data-scroll-target="#pca-e-interpretación.">PCA e interpretación.</a></li>
+  <li><a href="#pca-e-interpretación." id="toc-pca-e-interpretación." class="nav-link" data-scroll-target="#pca-e-interpretación.">PCA e interpretación.</a>
+  <ul class="collapse">
+  <li><a href="#realice-el-pca-sobre-las-variables-seleccionadas.-con-cuantas-componentes-decide-quedarse-luego-de-la-reduccion-de-dimensionalidad" id="toc-realice-el-pca-sobre-las-variables-seleccionadas.-con-cuantas-componentes-decide-quedarse-luego-de-la-reduccion-de-dimensionalidad" class="nav-link" data-scroll-target="#realice-el-pca-sobre-las-variables-seleccionadas.-con-cuantas-componentes-decide-quedarse-luego-de-la-reduccion-de-dimensionalidad">Realice el PCA sobre las variables seleccionadas. ¿Con cuantas componentes decide quedarse luego de la reduccion de dimensionalidad?</a></li>
+  <li><a href="#interprete-las-cargas-factoriales-de-las-primeras-dos-componentes-principales.-qué-atributos-de-los-jugadores-están-más-representados-en-cada-componente-mostrar-el-biplot-del-pca-realizado." id="toc-interprete-las-cargas-factoriales-de-las-primeras-dos-componentes-principales.-qué-atributos-de-los-jugadores-están-más-representados-en-cada-componente-mostrar-el-biplot-del-pca-realizado." class="nav-link" data-scroll-target="#interprete-las-cargas-factoriales-de-las-primeras-dos-componentes-principales.-qué-atributos-de-los-jugadores-están-más-representados-en-cada-componente-mostrar-el-biplot-del-pca-realizado.">Interprete las cargas factoriales de las primeras dos componentes principales. ¿Qué atributos de los jugadores están más representados en cada componente? Mostrar el biplot del PCA realizado.</a></li>
+  <li><a href="#identifique-si-hay-agrupamientos-naturales-de-jugadores-en-función-de-las-características-seleccionadas.-interprete-y-concluya." id="toc-identifique-si-hay-agrupamientos-naturales-de-jugadores-en-función-de-las-características-seleccionadas.-interprete-y-concluya." class="nav-link" data-scroll-target="#identifique-si-hay-agrupamientos-naturales-de-jugadores-en-función-de-las-características-seleccionadas.-interprete-y-concluya.">Identifique si hay agrupamientos naturales de jugadores en función de las características seleccionadas. Interprete y concluya.</a></li>
+  <li><a href="#elegir-una-técnica-de-pca-robusto-y-aplicarla-sobre-la-base-de-datos.-compare-los-resultados-con-los-obtenidos-anteriormente.-concluir." id="toc-elegir-una-técnica-de-pca-robusto-y-aplicarla-sobre-la-base-de-datos.-compare-los-resultados-con-los-obtenidos-anteriormente.-concluir." class="nav-link" data-scroll-target="#elegir-una-técnica-de-pca-robusto-y-aplicarla-sobre-la-base-de-datos.-compare-los-resultados-con-los-obtenidos-anteriormente.-concluir.">Elegir una técnica de PCA robusto y aplicarla sobre la base de datos. Compare los resultados con los obtenidos anteriormente. Concluir.</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -145,85 +183,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Código</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sample)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>    player            country              height          weight      
- Length:2000        Length:2000        Min.   :161.0   Min.   : 55.00  
- Class :character   Class :character   1st Qu.:177.0   1st Qu.: 70.00  
- Mode  :character   Mode  :character   Median :182.0   Median : 75.00  
-                                       Mean   :181.4   Mean   : 75.04  
-                                       3rd Qu.:186.0   3rd Qu.: 80.00  
-                                       Max.   :204.0   Max.   :102.00  
-      age            club            ball_control     dribbling    
- Min.   :17.00   Length:2000        Min.   : 9.00   Min.   : 5.00  
- 1st Qu.:23.00   Class :character   1st Qu.:56.00   1st Qu.:52.00  
- Median :26.00   Mode  :character   Median :63.00   Median :62.00  
- Mean   :26.34                      Mean   :59.63   Mean   :57.12  
- 3rd Qu.:30.00                      3rd Qu.:69.00   3rd Qu.:69.00  
- Max.   :41.00                      Max.   :94.00   Max.   :95.00  
-   marking           slide_tackle    stand_tackle     aggression   
- Length:2000        Min.   : 7.00   Min.   : 7.00   Min.   :11.00  
- Class :character   1st Qu.:28.00   1st Qu.:31.00   1st Qu.:46.00  
- Mode  :character   Median :55.00   Median :57.00   Median :60.00  
-                    Mean   :47.08   Mean   :49.21   Mean   :56.75  
-                    3rd Qu.:64.00   3rd Qu.:66.00   3rd Qu.:69.00  
-                    Max.   :84.00   Max.   :86.00   Max.   :95.00  
-   reactions      att_position   interceptions       vision     
- Min.   :32.00   Min.   : 3.00   Min.   : 6.00   Min.   :13.00  
- 1st Qu.:56.00   1st Qu.:42.00   1st Qu.:28.00   1st Qu.:46.75  
- Median :62.00   Median :57.00   Median :54.00   Median :57.00  
- Mean   :61.98   Mean   :51.64   Mean   :47.69   Mean   :55.19  
- 3rd Qu.:68.00   3rd Qu.:65.00   3rd Qu.:64.00   3rd Qu.:65.00  
- Max.   :92.00   Max.   :93.00   Max.   :84.00   Max.   :94.00  
-   composure        crossing       short_pass      long_pass    
- Min.   :21.00   Min.   : 6.00   Min.   :14.00   Min.   : 9.00  
- 1st Qu.:52.00   1st Qu.:40.00   1st Qu.:56.00   1st Qu.:47.00  
- Median :60.00   Median :55.00   Median :63.00   Median :57.00  
- Mean   :59.04   Mean   :50.62   Mean   :59.96   Mean   :54.53  
- 3rd Qu.:67.00   3rd Qu.:63.00   3rd Qu.:68.00   3rd Qu.:64.00  
- Max.   :96.00   Max.   :87.00   Max.   :92.00   Max.   :92.00  
-  acceleration      stamina         strength        balance     
- Min.   :12.00   Min.   :14.00   Min.   :25.00   Min.   :20.00  
- 1st Qu.:59.00   1st Qu.:58.00   1st Qu.:57.00   1st Qu.:57.00  
- Median :68.00   Median :67.00   Median :66.00   Median :67.00  
- Mean   :65.44   Mean   :64.13   Mean   :65.17   Mean   :64.76  
- 3rd Qu.:76.00   3rd Qu.:75.00   3rd Qu.:74.00   3rd Qu.:74.00  
- Max.   :92.00   Max.   :94.00   Max.   :95.00   Max.   :95.00  
-  sprint_speed      agility         jumping         heading     
- Min.   :13.00   Min.   :21.00   Min.   :23.00   Min.   : 6.00  
- 1st Qu.:58.75   1st Qu.:56.75   1st Qu.:58.00   1st Qu.:45.00  
- Median :68.00   Median :67.00   Median :66.00   Median :56.00  
- Mean   :65.59   Mean   :64.49   Mean   :65.25   Mean   :52.71  
- 3rd Qu.:76.00   3rd Qu.:75.00   3rd Qu.:73.00   3rd Qu.:64.00  
- Max.   :94.00   Max.   :93.00   Max.   :95.00   Max.   :90.00  
-   shot_power      finishing       long_shots        curve           fk_acc    
- Min.   :20.00   Min.   : 4.00   Min.   : 5.00   Min.   : 7.00   Min.   : 6.0  
- 1st Qu.:49.00   1st Qu.:33.00   1st Qu.:35.00   1st Qu.:38.00   1st Qu.:32.0  
- Median :60.00   Median :52.00   Median :52.00   Median :51.00   Median :44.0  
- Mean   :58.66   Mean   :47.27   Mean   :48.05   Mean   :48.81   Mean   :43.9  
- 3rd Qu.:68.00   3rd Qu.:62.00   3rd Qu.:62.00   3rd Qu.:62.00   3rd Qu.:56.0  
- Max.   :93.00   Max.   :92.00   Max.   :91.00   Max.   :93.00   Max.   :93.0  
-   penalties        volleys      gk_positioning    gk_diving      gk_handling  
- Min.   :10.00   Min.   : 4.00   Min.   : 2.00   Min.   : 2.00   Min.   : 2.0  
- 1st Qu.:39.00   1st Qu.:31.00   1st Qu.: 8.00   1st Qu.: 8.00   1st Qu.: 8.0  
- Median :50.00   Median :45.00   Median :11.00   Median :11.00   Median :11.0  
- Mean   :48.87   Mean   :43.41   Mean   :15.58   Mean   :15.76   Mean   :15.6  
- 3rd Qu.:60.00   3rd Qu.:57.00   3rd Qu.:14.00   3rd Qu.:14.00   3rd Qu.:14.0  
- Max.   :92.00   Max.   :90.00   Max.   :90.00   Max.   :84.00   Max.   :87.0  
-   gk_kicking    gk_reflexes       value          
- Min.   : 2.0   Min.   : 3.00   Length:2000       
- 1st Qu.: 8.0   1st Qu.: 8.00   Class :character  
- Median :11.0   Median :11.00   Mode  :character  
- Mean   :15.5   Mean   :15.92                     
- 3rd Qu.:14.0   3rd Qu.:14.00                     
- Max.   :85.0   Max.   :86.00                     </code></pre>
-</div>
-</div>
-<div class="cell">
-<details open="" class="code-fold">
-<summary>Código</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apply</span>(<span class="fu">is.na</span>(sample), <span class="dv">2</span>, sum)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apply</span>(<span class="fu">is.na</span>(sample), <span class="dv">2</span>, sum)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>        player        country         height         weight            age 
@@ -250,7 +210,7 @@ gk_positioning      gk_diving    gk_handling     gk_kicking    gk_reflexes
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Código</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sample[<span class="fu">duplicated</span>(sample),]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sample[<span class="fu">duplicated</span>(sample),]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] player         country        height         weight         age           
@@ -273,28 +233,28 @@ gk_positioning      gk_diving    gk_handling     gk_kicking    gk_reflexes
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Código</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>numericas <span class="ot">&lt;-</span> sample[, <span class="fu">sapply</span>(sample, is.numeric)]</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>numericas_std <span class="ot">&lt;-</span> <span class="fu">scale</span>(numericas)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>numericas <span class="ot">&lt;-</span> sample[, <span class="fu">sapply</span>(sample, is.numeric)]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>numericas_std <span class="ot">&lt;-</span> <span class="fu">scale</span>(numericas)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>A ver la matriz de correlación</p>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Código</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>corrplot 0.95 loaded</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Código</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>m_cor <span class="ot">&lt;-</span> <span class="fu">cor</span>(numericas_std) </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># representa la matriz de correlaciones mediante círculos</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(m_cor,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">method=</span><span class="st">"circle"</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">"upper"</span>,</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">diag=</span> <span class="cn">FALSE</span>) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>m_cor <span class="ot">&lt;-</span> <span class="fu">cor</span>(numericas_std) </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># representa la matriz de correlaciones mediante círculos</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(m_cor,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">method=</span><span class="st">"circle"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">"upper"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">diag=</span> <span class="cn">FALSE</span>) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -308,12 +268,12 @@ gk_positioning      gk_diving    gk_handling     gk_kicking    gk_reflexes
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Código</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>high_cor <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">abs</span>(m_cor) <span class="sc">&gt;</span> <span class="fl">0.9</span> <span class="sc">&amp;</span> <span class="fu">abs</span>(m_cor) <span class="sc">&lt;</span> <span class="dv">1</span>, <span class="at">arr.ind =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>redundantes <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">apply</span>(high_cor, <span class="dv">1</span>, <span class="cf">function</span>(idx) {</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="fu">rownames</span>(m_cor)[idx[<span class="dv">1</span>]], <span class="fu">colnames</span>(m_cor)[idx[<span class="dv">2</span>]], <span class="at">sep =</span> <span class="st">" - "</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>}))</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>redundantes</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>high_cor <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">abs</span>(m_cor) <span class="sc">&gt;</span> <span class="fl">0.9</span> <span class="sc">&amp;</span> <span class="fu">abs</span>(m_cor) <span class="sc">&lt;</span> <span class="dv">1</span>, <span class="at">arr.ind =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>redundantes <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">apply</span>(high_cor, <span class="dv">1</span>, <span class="cf">function</span>(idx) {</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="fu">rownames</span>(m_cor)[idx[<span class="dv">1</span>]], <span class="fu">colnames</span>(m_cor)[idx[<span class="dv">2</span>]], <span class="at">sep =</span> <span class="st">" - "</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>redundantes</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "dribbling - ball_control"     "short_pass - ball_control"   
@@ -338,18 +298,927 @@ gk_positioning      gk_diving    gk_handling     gk_kicking    gk_reflexes
 [39] "gk_handling - gk_reflexes"    "gk_kicking - gk_reflexes"    </code></pre>
 </div>
 </div>
-<p>3- Realice una descripción de las variables numéricas seleccionadas.</p>
-<p>4- ¿Se estandarizaron las variables? Justifique.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: lattice</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'caret'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:purrr':
+
+    lift</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(numericas, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>redundant_vars <span class="ot">&lt;-</span> <span class="fu">findCorrelation</span>(cor_matrix, <span class="at">cutoff =</span> <span class="fl">0.9</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>numericas_reducido <span class="ot">&lt;-</span> numericas[, <span class="sc">-</span>redundant_vars]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Buenos las que tiro van a ser <code>ball_control</code> <code>dribbling</code> <code>short_pass</code> <code>att_position</code> <code>long_shots</code> <code>gk_diving</code> <code>gk_reflexes</code> <code>gk_handling</code> <code>gk_positioning</code> <code>acceleration</code> <code>interceptions</code> <code>slide_tackle</code></p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>m_cor <span class="ot">&lt;-</span> <span class="fu">cor</span>(numericas_reducido) </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># representa la matriz de correlaciones mediante círculos</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(m_cor,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">method=</span><span class="st">"circle"</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">"upper"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">diag=</span> <span class="cn">FALSE</span>) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tp_pca_files/figure-html/aver_estas-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="realice-una-descripción-de-las-variables-numéricas-seleccionadas." class="level3">
+<h3 class="anchored" data-anchor-id="realice-una-descripción-de-las-variables-numéricas-seleccionadas.">Realice una descripción de las variables numéricas seleccionadas.</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># las columnas estas las escalo con la normal</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>cols_standard <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"weight"</span>, <span class="st">"height"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>fisico_std <span class="ot">&lt;-</span> <span class="fu">scale</span>(numericas_reducido[, cols_standard])</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># para el resto tomo min max porque van de 0 a 100</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>cols_minmax <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(numericas_reducido), cols_standard)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>skills_std <span class="ot">&lt;-</span> numericas_reducido[, cols_minmax] <span class="sc">%&gt;%</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> (. <span class="sc">-</span> <span class="fu">min</span>(.)) <span class="sc">/</span> (<span class="fu">max</span>(.) <span class="sc">-</span> <span class="fu">min</span>(.))))</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Convertir a data frame largo</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>fisico_long <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fisico_std) <span class="sc">%&gt;%</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"valor"</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(fisico_long, <span class="fu">aes</span>(<span class="at">x =</span> variable, <span class="at">y =</span> valor)) <span class="sc">+</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tp_pca_files/figure-html/desc-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>skills_long <span class="ot">&lt;-</span> skills_std <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"variable"</span>, <span class="at">values_to =</span> <span class="st">"valor"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(skills_long, <span class="fu">aes</span>(<span class="at">x =</span> variable, <span class="at">y =</span> valor)) <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Skills"</span>) <span class="sc">+</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tp_pca_files/figure-html/desc-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Bueno las variables físicas (<code>age</code>, <code>height</code> y <code>weight</code>) relativamente normales, aunque hay algunos outliers sobre todo en cuanto al peso de los jugadores.<br>
+Las variables de habilidad están escaladas MinMax porque van de 0 a 100. En general hay algunas habilidades en la que hay algunos outliers de jugadores malos (por ejemplo <code>agility</code>, <code>stamina</code>), mientras que otras tiene outliers por jugadores buenos, como <code>composure</code>. Esto ultimo para el caso de <code>gk_kicking</code> es notorio, porque la mayoria no son arqueros.</p>
 </section>
 </section>
 <section id="pca-e-interpretación." class="level1">
 <h1>PCA e interpretación.</h1>
-<p>5- Realice el PCA sobre las variables seleccionadas. ¿Con cuantas componentes decide quedarse luego de la reduccion de dimensionalidad?</p>
-<p>6- Interprete las cargas factoriales de las primeras dos componentes principales. ¿Qué atributos de los jugadores están más representados en cada componente? Mostrar el biplot del PCA realizado.</p>
-<p>7- Identifique si hay agrupamientos naturales de jugadores en función de las características seleccionadas. Interprete y concluya.</p>
-<p>8- Elegir una técnica de PCA robusto y aplicarla sobre la base de datos. Compare los resultados con los obtenidos anteriormente. Concluir.</p>
+<section id="realice-el-pca-sobre-las-variables-seleccionadas.-con-cuantas-componentes-decide-quedarse-luego-de-la-reduccion-de-dimensionalidad" class="level3">
+<h3 class="anchored" data-anchor-id="realice-el-pca-sobre-las-variables-seleccionadas.-con-cuantas-componentes-decide-quedarse-luego-de-la-reduccion-de-dimensionalidad">Realice el PCA sobre las variables seleccionadas. ¿Con cuantas componentes decide quedarse luego de la reduccion de dimensionalidad?</h3>
+<p>Combino los datos de habilidad y físico y uso matriz de correlación</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(numericas_reducido,</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">scale =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(pca<span class="sc">$</span>rotation,<span class="dv">2</span>) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"html"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC4</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC7</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC9</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC10</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC11</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC12</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC13</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC14</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC15</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC16</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC17</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC18</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC19</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC20</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC21</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC22</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC23</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PC24</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">height</td>
+<td style="text-align: right;">-0.14</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: right;">-0.16</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">-0.21</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">-0.41</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: right;">-0.45</td>
+<td style="text-align: right;">-0.24</td>
+<td style="text-align: right;">-0.22</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">-0.08</td>
+<td style="text-align: right;">-0.07</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">weight</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: right;">-0.19</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">-0.50</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">-0.33</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">-0.23</td>
+<td style="text-align: right;">-0.43</td>
+<td style="text-align: right;">-0.23</td>
+<td style="text-align: right;">0.65</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">-0.13</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">-0.07</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">stand_tackle</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: right;">0.43</td>
+<td style="text-align: right;">-0.25</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">-0.10</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.14</td>
+<td style="text-align: right;">-0.02</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.18</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">-0.25</td>
+<td style="text-align: right;">0.63</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">-0.21</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">aggression</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">0.28</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">-0.12</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">-0.36</td>
+<td style="text-align: right;">-0.24</td>
+<td style="text-align: right;">-0.27</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">-0.14</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">-0.08</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">-0.19</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">reactions</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">-0.35</td>
+<td style="text-align: right;">-0.13</td>
+<td style="text-align: right;">-0.39</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">0.42</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">-0.25</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">-0.28</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">-0.17</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.12</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">-0.21</td>
+<td style="text-align: right;">-0.02</td>
+<td style="text-align: right;">0.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vision</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">-0.23</td>
+<td style="text-align: right;">-0.17</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">-0.18</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">0.52</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">-0.16</td>
+<td style="text-align: right;">-0.19</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">0.12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">composure</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">-0.13</td>
+<td style="text-align: right;">-0.17</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.14</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">-0.27</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">-0.49</td>
+<td style="text-align: right;">-0.18</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">-0.07</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">-0.08</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">-0.04</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">crossing</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">-0.07</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">-0.07</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">-0.28</td>
+<td style="text-align: right;">-0.15</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: right;">-0.08</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.42</td>
+<td style="text-align: right;">0.05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">long_pass</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">-0.21</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: right;">-0.10</td>
+<td style="text-align: right;">-0.13</td>
+<td style="text-align: right;">-0.14</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">-0.24</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">-0.44</td>
+<td style="text-align: right;">-0.16</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">-0.22</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.04</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">stamina</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.24</td>
+<td style="text-align: right;">0.28</td>
+<td style="text-align: right;">0.48</td>
+<td style="text-align: right;">-0.36</td>
+<td style="text-align: right;">-0.36</td>
+<td style="text-align: right;">-0.29</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">-0.15</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">strength</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">-0.02</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">-0.02</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.42</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">-0.22</td>
+<td style="text-align: right;">0.55</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">-0.32</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">-0.07</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">balance</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">-0.24</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">-0.24</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">-0.46</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">-0.10</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">-0.27</td>
+<td style="text-align: right;">-0.23</td>
+<td style="text-align: right;">-0.58</td>
+<td style="text-align: right;">-0.12</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.18</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">-0.05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sprint_speed</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">-0.25</td>
+<td style="text-align: right;">0.48</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">-0.22</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">-0.18</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">0.42</td>
+<td style="text-align: right;">-0.18</td>
+<td style="text-align: right;">-0.16</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">-0.03</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">agility</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">-0.02</td>
+<td style="text-align: right;">-0.24</td>
+<td style="text-align: right;">-0.17</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">-0.19</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.02</td>
+<td style="text-align: right;">-0.13</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.38</td>
+<td style="text-align: right;">-0.12</td>
+<td style="text-align: right;">0.62</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">jumping</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.64</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">-0.41</td>
+<td style="text-align: right;">-0.49</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.12</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">heading</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">-0.12</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.24</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">-0.22</td>
+<td style="text-align: right;">0.55</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">-0.21</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">shot_power</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">-0.36</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">-0.17</td>
+<td style="text-align: right;">-0.10</td>
+<td style="text-align: right;">-0.51</td>
+<td style="text-align: right;">-0.35</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">-0.29</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">-0.15</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.30</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">finishing</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">-0.07</td>
+<td style="text-align: right;">-0.21</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">-0.07</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">-0.43</td>
+<td style="text-align: right;">-0.16</td>
+<td style="text-align: right;">-0.71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">curve</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: right;">-0.07</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">-0.26</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">-0.02</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">-0.21</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">-0.02</td>
+<td style="text-align: right;">-0.10</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">-0.10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fk_acc</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">-0.15</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">-0.34</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">-0.34</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">-0.24</td>
+<td style="text-align: right;">-0.14</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">-0.44</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">-0.33</td>
+<td style="text-align: right;">-0.03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">penalties</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.19</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">-0.14</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.16</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">-0.18</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">-0.06</td>
+<td style="text-align: right;">-0.14</td>
+<td style="text-align: right;">0.41</td>
+<td style="text-align: right;">-0.23</td>
+<td style="text-align: right;">0.61</td>
+<td style="text-align: right;">-0.12</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">volleys</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">-0.21</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">0.11</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.04</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">-0.29</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.10</td>
+<td style="text-align: right;">0.52</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">0.29</td>
+<td style="text-align: right;">-0.19</td>
+<td style="text-align: right;">0.23</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gk_kicking</td>
+<td style="text-align: right;">-0.22</td>
+<td style="text-align: right;">-0.02</td>
+<td style="text-align: right;">-0.29</td>
+<td style="text-align: right;">-0.30</td>
+<td style="text-align: right;">-0.13</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">-0.10</td>
+<td style="text-align: right;">-0.14</td>
+<td style="text-align: right;">-0.18</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">-0.08</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">-0.09</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">-0.11</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.52</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">-0.50</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p>Para ver con cuantas me quedo voy a ver primero la varianza explicada</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>prop_varianza <span class="ot">&lt;-</span> pca<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="fu">sum</span>(pca<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>prop_varianza_acum <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(prop_varianza)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> <span class="fu">data.frame</span>(prop_varianza_acum, <span class="at">pc =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">24</span>),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> pc, <span class="at">y =</span> prop_varianza_acum, <span class="at">group =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Componente principal"</span>,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Prop. varianza explicada acumulada"</span>) <span class="sc">+</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.1</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tp_pca_files/figure-html/varianza_explicada-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Bueno con las primeras 4 componentes tengo más del 80% de varianza explicada, no está mal. Además si me quedo con las primeras 4 cumplo el criterio de Kaiser (<span class="math inline">\(\lambda_4 = 1.12, \lambda_5 = 0.99\)</span>).</p>
+</section>
+<section id="interprete-las-cargas-factoriales-de-las-primeras-dos-componentes-principales.-qué-atributos-de-los-jugadores-están-más-representados-en-cada-componente-mostrar-el-biplot-del-pca-realizado." class="level3">
+<h3 class="anchored" data-anchor-id="interprete-las-cargas-factoriales-de-las-primeras-dos-componentes-principales.-qué-atributos-de-los-jugadores-están-más-representados-en-cada-componente-mostrar-el-biplot-del-pca-realizado.">Interprete las cargas factoriales de las primeras dos componentes principales. ¿Qué atributos de los jugadores están más representados en cada componente? Mostrar el biplot del PCA realizado.</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear data frame con ambas cargas y pasar a formato largo</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>cargas_long <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable =</span> <span class="fu">colnames</span>(numericas_reducido),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">PC1 =</span> pca<span class="sc">$</span>rotation[, <span class="dv">1</span>],</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">PC2 =</span> pca<span class="sc">$</span>rotation[, <span class="dv">2</span>]</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(PC1, PC2), <span class="at">names_to =</span> <span class="st">"componente"</span>, <span class="at">values_to =</span> <span class="st">"carga"</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico de barras comparando PC1 y PC2</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cargas_long, <span class="fu">aes</span>(<span class="at">x =</span> variable, <span class="at">y =</span> carga, <span class="at">fill =</span> componente)) <span class="sc">+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"PC1"</span> <span class="ot">=</span> <span class="st">"royalblue"</span>, <span class="st">"PC2"</span> <span class="ot">=</span> <span class="st">"tomato"</span>)) <span class="sc">+</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Variables"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Carga"</span>) <span class="sc">+</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tp_pca_files/figure-html/cargas-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Como se ve en el diagrama, la PC1 tiene contribución parecida de todas las habilidades. Las que menos contribuyen a la componente 1 son las que tienen que ver con las características físicas, estas son, <code>age</code>, <code>strenght</code>, <code>jumping</code> y luego en menor medida <code>weight</code> y <code>height</code>. Estos atributos de hecho son los que contribuyen mayormente a la componente 2.<br>
+Pareciera ser que la componente 1 está compuesta más por los skills que por los aspectos físicos y para la componente 2 es lo opuesto.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(pca, </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">data =</span> numericas_reducido, </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">loadings =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">loadings.colour =</span> <span class="st">'lightblue'</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">loadings.label =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">loadings.label.size =</span> <span class="dv">5</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tp_pca_files/figure-html/biplot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Aca podemos ver un poco más de lo que veníamos destacando, pero agregando que la dirección entre <code>strength</code> y <code>height</code>-<code>weight</code> no son las mismas. Es decir, si bien contribuyen poco a la componente 1 y más a la 2, contribuyen de distinta manera.</p>
+</section>
+<section id="identifique-si-hay-agrupamientos-naturales-de-jugadores-en-función-de-las-características-seleccionadas.-interprete-y-concluya." class="level3">
+<h3 class="anchored" data-anchor-id="identifique-si-hay-agrupamientos-naturales-de-jugadores-en-función-de-las-características-seleccionadas.-interprete-y-concluya.">Identifique si hay agrupamientos naturales de jugadores en función de las características seleccionadas. Interprete y concluya.</h3>
+<p>Siguiendo con el biplot podemos ver que el agrupamiento natural más relevante es si es arquero o no, segun u habilidad <code>gk_kicking</code>.<br>
+Quizá también podemos identificar un agrupamiento por Alturay peso.</p>
+</section>
+<section id="elegir-una-técnica-de-pca-robusto-y-aplicarla-sobre-la-base-de-datos.-compare-los-resultados-con-los-obtenidos-anteriormente.-concluir." class="level3">
+<h3 class="anchored" data-anchor-id="elegir-una-técnica-de-pca-robusto-y-aplicarla-sobre-la-base-de-datos.-compare-los-resultados-con-los-obtenidos-anteriormente.-concluir.">Elegir una técnica de PCA robusto y aplicarla sobre la base de datos. Compare los resultados con los obtenidos anteriormente. Concluir.</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>pca_mcd <span class="ot">&lt;-</span><span class="fu">princomp</span>(numericas_reducido, </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">cor=</span><span class="cn">TRUE</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">scores=</span><span class="cn">TRUE</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">covmat=</span>MASS<span class="sc">::</span><span class="fu">cov.mcd</span>(numericas_reducido))<span class="co">#se especifica MCD</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span><span class="fu">fviz_eig</span>(pca_mcd, <span class="at">ncp =</span><span class="dv">5</span>, <span class="at">addlabels =</span> <span class="cn">TRUE</span>, <span class="at">main=</span><span class="st">"MCD"</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>p2<span class="ot">&lt;-</span> <span class="fu">fviz_eig</span>(pca, <span class="at">ncp =</span><span class="dv">5</span>, <span class="at">addlabels =</span> <span class="cn">TRUE</span>, <span class="at">main=</span><span class="st">"No Robusto"</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggarrange</span>(p1,p2, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tp_pca_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Esto parece indicar que las componentes se reparten un poco más la variabilidad que la no robusta.</p>
 <!-- -->
 
+</section>
 </section>
 
 </main>
@@ -825,117 +1694,248 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Ejecutar el código</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb14" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "TP Análisis de Componentes Principales"</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Docentes AID 2025"</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> es</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">    theme:  flatly</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: show</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-location: left</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="in">```{r setup, include=FALSE}</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="in">knitr::opts_chunk$set(echo = TRUE)</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggrepel)</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="in">library(gsheet)</span></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="in">library(rgl)</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="in">library(plot3D)</span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="in">library(GGally)</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="in">library(reshape2)</span></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="in">library(plotly)</span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="in">library(kableExtra)</span></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>Para este trabajo práctico se trabajará sobre la base de datos de FIFA 2024 MEN. Setear la semilla con los últimos 3 digitos del DNI para obtener una muestra de 2000 individuos.</span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>wd <span class="ot">&lt;-</span> <span class="st">"/home/mfeijoo/Documents/yo/master/aid/tps_aid/tp3/player_stats.csv"</span></span>
-<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(wd)</span>
-<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">606</span>) <span class="co">#cambiar por los 3 digitos del DNI.</span></span>
-<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>sample <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
-<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>          <span class="fu">sample_n</span>(<span class="dv">2000</span>)<span class="co"># muestreo aletorio de 2000 individuos</span></span>
-<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a><span class="fu"># Objetivo</span></span>
-<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>Aplicar el Análisis de Componentes Principales (PCA) para reducir la dimensionalidad del dataset de FIFA 2024 Men, identificar patrones en los datos y visualizar cómo se agrupan los jugadores en función de sus características.</span>
-<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a><span class="fu"># Análisis exploratorio de datos y preprocesamiento</span></span>
-<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a><span class="fu">### Analice la presencia de valores faltantes y datos duplicados.</span></span>
-<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>A ver qué tengo</span>
-<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="in">```{r analisis}</span></span>
-<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="in">summary(sample)</span></span>
-<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r haynans}</span></span>
-<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a><span class="in">apply(is.na(sample), 2, sum)</span></span>
-<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>No tengo Nans en ninguna columna. A ver duplicados</span>
-<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r hay_duplicados}</span></span>
-<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a><span class="in">sample[duplicated(sample),]</span></span>
-<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>No tengo duplicados tampoco. </span>
-<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a><span class="fu">### Seleccione un subconjunto de variables relevantes para realizar el PCA. Justifique la selección.</span></span>
-<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a>Para empezar me agarro las columnas numéricas y estandarizo</span>
-<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a><span class="in">```{r numerics, fig.height=10, fig.width=15}</span></span>
-<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a><span class="in">numericas &lt;- sample[, sapply(sample, is.numeric)]</span></span>
-<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a><span class="in">numericas_std &lt;- scale(numericas)</span></span>
-<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a>A ver la matriz de correlación</span>
-<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a><span class="in">```{r corr_mat, fig.height=8, fig.width=12}</span></span>
-<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a><span class="in">library(corrplot)</span></span>
-<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a><span class="in">m_cor &lt;- cor(numericas_std) </span></span>
-<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a><span class="in"># representa la matriz de correlaciones mediante círculos</span></span>
-<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a><span class="in">corrplot(m_cor,</span></span>
-<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a><span class="in">         method="circle",</span></span>
-<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a><span class="in">         type = "upper",</span></span>
-<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a><span class="in">         diag= FALSE) </span></span>
-<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a>Claramente hay variables que se podrían combinar en una sola, como todas las habilidades de arquero.</span>
-<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a>A ver las que están más correlacionadas entre sí.</span>
-<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r aver_redundantes}</span></span>
-<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a><span class="in">high_cor &lt;- which(abs(m_cor) &gt; 0.9 &amp; abs(m_cor) &lt; 1, arr.ind = TRUE)</span></span>
-<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a><span class="in">redundantes &lt;- unique(apply(high_cor, 1, function(idx) {</span></span>
-<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a><span class="in">  paste(rownames(m_cor)[idx[1]], colnames(m_cor)[idx[2]], sep = " - ")</span></span>
-<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a><span class="in">}))</span></span>
-<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a><span class="in">redundantes</span></span>
-<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a><span class="in">```</span> </span>
-<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a>3- Realice una descripción de las variables numéricas seleccionadas.</span>
-<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a>4- ¿Se estandarizaron las variables? Justifique.</span>
-<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a><span class="fu"># PCA e interpretación.</span></span>
-<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a>5- Realice el PCA sobre las variables seleccionadas. ¿Con cuantas componentes decide quedarse luego de la reduccion de dimensionalidad? </span>
-<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a>6- Interprete las cargas factoriales de las primeras dos componentes principales. ¿Qué atributos de los jugadores están más representados en cada componente? Mostrar el biplot del PCA realizado.</span>
-<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a>7- Identifique si hay agrupamientos naturales de jugadores en función de las características seleccionadas. Interprete y concluya.</span>
-<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a>8- Elegir una técnica de PCA robusto y aplicarla sobre la base de datos. Compare los resultados con los obtenidos anteriormente. Concluir.</span>
+<div class="sourceCode" id="cb28" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "TP Análisis de Componentes Principales"</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Docentes AID 2025"</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> es</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">    theme:  flatly</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: show</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-location: left</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="in">```{r setup, include=FALSE}</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="in">knitr::opts_chunk$set(echo = TRUE)</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggfortify)</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggrepel)</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="in">library(gsheet)</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="in">library(rgl)</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="in">library(plot3D)</span></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="in">library(GGally)</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="in">library(reshape2)</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="in">library(plotly)</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a><span class="in">library(kableExtra)</span></span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>Para este trabajo práctico se trabajará sobre la base de datos de FIFA 2024 MEN. Setear la semilla con los últimos 3 digitos del DNI para obtener una muestra de 2000 individuos.</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>wd <span class="ot">&lt;-</span> <span class="st">"/home/mfeijoo/Documents/yo/master/aid/tps_aid/tp3/player_stats.csv"</span></span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(wd)</span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">606</span>) <span class="co">#cambiar por los 3 digitos del DNI.</span></span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>sample <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>          <span class="fu">sample_n</span>(<span class="dv">2000</span>)<span class="co"># muestreo aletorio de 2000 individuos</span></span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a><span class="fu"># Objetivo</span></span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>Aplicar el Análisis de Componentes Principales (PCA) para reducir la dimensionalidad del dataset de FIFA 2024 Men, identificar patrones en los datos y visualizar cómo se agrupan los jugadores en función de sus características.</span>
+<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a><span class="fu"># Análisis exploratorio de datos y preprocesamiento</span></span>
+<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a><span class="fu">### Analice la presencia de valores faltantes y datos duplicados.</span></span>
+<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a>A ver qué tengo</span>
+<span id="cb28-52"><a href="#cb28-52" aria-hidden="true" tabindex="-1"></a><span class="in">```{r analisis, echo=FALSE, include=FALSE}</span></span>
+<span id="cb28-53"><a href="#cb28-53" aria-hidden="true" tabindex="-1"></a><span class="in">summary(sample)</span></span>
+<span id="cb28-54"><a href="#cb28-54" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-55"><a href="#cb28-55" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r haynans}</span></span>
+<span id="cb28-56"><a href="#cb28-56" aria-hidden="true" tabindex="-1"></a><span class="in">apply(is.na(sample), 2, sum)</span></span>
+<span id="cb28-57"><a href="#cb28-57" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-58"><a href="#cb28-58" aria-hidden="true" tabindex="-1"></a>No tengo Nans en ninguna columna. A ver duplicados</span>
+<span id="cb28-59"><a href="#cb28-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-60"><a href="#cb28-60" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r hay_duplicados}</span></span>
+<span id="cb28-61"><a href="#cb28-61" aria-hidden="true" tabindex="-1"></a><span class="in">sample[duplicated(sample),]</span></span>
+<span id="cb28-62"><a href="#cb28-62" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-63"><a href="#cb28-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-64"><a href="#cb28-64" aria-hidden="true" tabindex="-1"></a>No tengo duplicados tampoco. </span>
+<span id="cb28-65"><a href="#cb28-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-66"><a href="#cb28-66" aria-hidden="true" tabindex="-1"></a><span class="fu">### Seleccione un subconjunto de variables relevantes para realizar el PCA. Justifique la selección.</span></span>
+<span id="cb28-67"><a href="#cb28-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-68"><a href="#cb28-68" aria-hidden="true" tabindex="-1"></a>Para empezar me agarro las columnas numéricas y estandarizo</span>
+<span id="cb28-69"><a href="#cb28-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-70"><a href="#cb28-70" aria-hidden="true" tabindex="-1"></a><span class="in">```{r numerics, fig.height=10, fig.width=15}</span></span>
+<span id="cb28-71"><a href="#cb28-71" aria-hidden="true" tabindex="-1"></a><span class="in">numericas &lt;- sample[, sapply(sample, is.numeric)]</span></span>
+<span id="cb28-72"><a href="#cb28-72" aria-hidden="true" tabindex="-1"></a><span class="in">numericas_std &lt;- scale(numericas)</span></span>
+<span id="cb28-73"><a href="#cb28-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-74"><a href="#cb28-74" aria-hidden="true" tabindex="-1"></a>A ver la matriz de correlación</span>
+<span id="cb28-75"><a href="#cb28-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-76"><a href="#cb28-76" aria-hidden="true" tabindex="-1"></a><span class="in">```{r corr_mat, fig.height=8, fig.width=12}</span></span>
+<span id="cb28-77"><a href="#cb28-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-78"><a href="#cb28-78" aria-hidden="true" tabindex="-1"></a><span class="in">library(corrplot)</span></span>
+<span id="cb28-79"><a href="#cb28-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-80"><a href="#cb28-80" aria-hidden="true" tabindex="-1"></a><span class="in">m_cor &lt;- cor(numericas_std) </span></span>
+<span id="cb28-81"><a href="#cb28-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-82"><a href="#cb28-82" aria-hidden="true" tabindex="-1"></a><span class="in"># representa la matriz de correlaciones mediante círculos</span></span>
+<span id="cb28-83"><a href="#cb28-83" aria-hidden="true" tabindex="-1"></a><span class="in">corrplot(m_cor,</span></span>
+<span id="cb28-84"><a href="#cb28-84" aria-hidden="true" tabindex="-1"></a><span class="in">         method="circle",</span></span>
+<span id="cb28-85"><a href="#cb28-85" aria-hidden="true" tabindex="-1"></a><span class="in">         type = "upper",</span></span>
+<span id="cb28-86"><a href="#cb28-86" aria-hidden="true" tabindex="-1"></a><span class="in">         diag= FALSE) </span></span>
+<span id="cb28-87"><a href="#cb28-87" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-88"><a href="#cb28-88" aria-hidden="true" tabindex="-1"></a>Claramente hay variables que se podrían combinar en una sola, como todas las habilidades de arquero.</span>
+<span id="cb28-89"><a href="#cb28-89" aria-hidden="true" tabindex="-1"></a>A ver las que están más correlacionadas entre sí.</span>
+<span id="cb28-90"><a href="#cb28-90" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r aver_redundantes}</span></span>
+<span id="cb28-91"><a href="#cb28-91" aria-hidden="true" tabindex="-1"></a><span class="in">high_cor &lt;- which(abs(m_cor) &gt; 0.9 &amp; abs(m_cor) &lt; 1, arr.ind = TRUE)</span></span>
+<span id="cb28-92"><a href="#cb28-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-93"><a href="#cb28-93" aria-hidden="true" tabindex="-1"></a><span class="in">redundantes &lt;- unique(apply(high_cor, 1, function(idx) {</span></span>
+<span id="cb28-94"><a href="#cb28-94" aria-hidden="true" tabindex="-1"></a><span class="in">  paste(rownames(m_cor)[idx[1]], colnames(m_cor)[idx[2]], sep = " - ")</span></span>
+<span id="cb28-95"><a href="#cb28-95" aria-hidden="true" tabindex="-1"></a><span class="in">}))</span></span>
+<span id="cb28-96"><a href="#cb28-96" aria-hidden="true" tabindex="-1"></a><span class="in">redundantes</span></span>
+<span id="cb28-97"><a href="#cb28-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-98"><a href="#cb28-98" aria-hidden="true" tabindex="-1"></a><span class="in">```</span> </span>
+<span id="cb28-99"><a href="#cb28-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-100"><a href="#cb28-100" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r saco_variables_redundantes}</span></span>
+<span id="cb28-101"><a href="#cb28-101" aria-hidden="true" tabindex="-1"></a><span class="in">library(caret)</span></span>
+<span id="cb28-102"><a href="#cb28-102" aria-hidden="true" tabindex="-1"></a><span class="in">cor_matrix &lt;- cor(numericas, use = "complete.obs")</span></span>
+<span id="cb28-103"><a href="#cb28-103" aria-hidden="true" tabindex="-1"></a><span class="in">redundant_vars &lt;- findCorrelation(cor_matrix, cutoff = 0.9)</span></span>
+<span id="cb28-104"><a href="#cb28-104" aria-hidden="true" tabindex="-1"></a><span class="in">numericas_reducido &lt;- numericas[, -redundant_vars]</span></span>
+<span id="cb28-105"><a href="#cb28-105" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-106"><a href="#cb28-106" aria-hidden="true" tabindex="-1"></a>Buenos las que tiro van a ser </span>
+<span id="cb28-107"><a href="#cb28-107" aria-hidden="true" tabindex="-1"></a><span class="in">`ball_control`</span> <span class="in">`dribbling`</span>  <span class="in">`short_pass`</span>  <span class="in">`att_position`</span> <span class="in">`long_shots`</span> <span class="in">`gk_diving`</span> <span class="in">`gk_reflexes`</span>  <span class="in">`gk_handling`</span>  <span class="in">`gk_positioning`</span> <span class="in">`acceleration`</span> <span class="in">`interceptions`</span> <span class="in">`slide_tackle`</span></span>
+<span id="cb28-108"><a href="#cb28-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-109"><a href="#cb28-109" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r aver_estas, fig.height=8, fig.width=12}</span></span>
+<span id="cb28-110"><a href="#cb28-110" aria-hidden="true" tabindex="-1"></a><span class="in">m_cor &lt;- cor(numericas_reducido) </span></span>
+<span id="cb28-111"><a href="#cb28-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-112"><a href="#cb28-112" aria-hidden="true" tabindex="-1"></a><span class="in"># representa la matriz de correlaciones mediante círculos</span></span>
+<span id="cb28-113"><a href="#cb28-113" aria-hidden="true" tabindex="-1"></a><span class="in">corrplot(m_cor,</span></span>
+<span id="cb28-114"><a href="#cb28-114" aria-hidden="true" tabindex="-1"></a><span class="in">         method="circle",</span></span>
+<span id="cb28-115"><a href="#cb28-115" aria-hidden="true" tabindex="-1"></a><span class="in">         type = "upper",</span></span>
+<span id="cb28-116"><a href="#cb28-116" aria-hidden="true" tabindex="-1"></a><span class="in">         diag= FALSE) </span></span>
+<span id="cb28-117"><a href="#cb28-117" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-118"><a href="#cb28-118" aria-hidden="true" tabindex="-1"></a><span class="fu">### Realice una descripción de las variables numéricas seleccionadas.</span></span>
+<span id="cb28-119"><a href="#cb28-119" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r desc}</span></span>
+<span id="cb28-120"><a href="#cb28-120" aria-hidden="true" tabindex="-1"></a><span class="in"># las columnas estas las escalo con la normal</span></span>
+<span id="cb28-121"><a href="#cb28-121" aria-hidden="true" tabindex="-1"></a><span class="in">cols_standard &lt;- c("age", "weight", "height")</span></span>
+<span id="cb28-122"><a href="#cb28-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-123"><a href="#cb28-123" aria-hidden="true" tabindex="-1"></a><span class="in">fisico_std &lt;- scale(numericas_reducido[, cols_standard])</span></span>
+<span id="cb28-124"><a href="#cb28-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-125"><a href="#cb28-125" aria-hidden="true" tabindex="-1"></a><span class="in"># para el resto tomo min max porque van de 0 a 100</span></span>
+<span id="cb28-126"><a href="#cb28-126" aria-hidden="true" tabindex="-1"></a><span class="in">cols_minmax &lt;- setdiff(names(numericas_reducido), cols_standard)</span></span>
+<span id="cb28-127"><a href="#cb28-127" aria-hidden="true" tabindex="-1"></a><span class="in">skills_std &lt;- numericas_reducido[, cols_minmax] %&gt;%</span></span>
+<span id="cb28-128"><a href="#cb28-128" aria-hidden="true" tabindex="-1"></a><span class="in">  mutate(across(everything(), ~ (. - min(.)) / (max(.) - min(.))))</span></span>
+<span id="cb28-129"><a href="#cb28-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-130"><a href="#cb28-130" aria-hidden="true" tabindex="-1"></a><span class="in"># Convertir a data frame largo</span></span>
+<span id="cb28-131"><a href="#cb28-131" aria-hidden="true" tabindex="-1"></a><span class="in">fisico_long &lt;- as.data.frame(fisico_std) %&gt;%</span></span>
+<span id="cb28-132"><a href="#cb28-132" aria-hidden="true" tabindex="-1"></a><span class="in">  pivot_longer(cols = everything(), names_to = "variable", values_to = "valor")</span></span>
+<span id="cb28-133"><a href="#cb28-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-134"><a href="#cb28-134" aria-hidden="true" tabindex="-1"></a><span class="in"># Boxplot</span></span>
+<span id="cb28-135"><a href="#cb28-135" aria-hidden="true" tabindex="-1"></a><span class="in">ggplot(fisico_long, aes(x = variable, y = valor)) +</span></span>
+<span id="cb28-136"><a href="#cb28-136" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_boxplot() +</span></span>
+<span id="cb28-137"><a href="#cb28-137" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() +</span></span>
+<span id="cb28-138"><a href="#cb28-138" aria-hidden="true" tabindex="-1"></a><span class="in">  theme(axis.text.x = element_text(angle = 45, hjust = 1))</span></span>
+<span id="cb28-139"><a href="#cb28-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-140"><a href="#cb28-140" aria-hidden="true" tabindex="-1"></a><span class="in">skills_long &lt;- skills_std %&gt;%</span></span>
+<span id="cb28-141"><a href="#cb28-141" aria-hidden="true" tabindex="-1"></a><span class="in">  pivot_longer(cols = everything(), names_to = "variable", values_to = "valor")</span></span>
+<span id="cb28-142"><a href="#cb28-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-143"><a href="#cb28-143" aria-hidden="true" tabindex="-1"></a><span class="in">ggplot(skills_long, aes(x = variable, y = valor)) +</span></span>
+<span id="cb28-144"><a href="#cb28-144" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_boxplot() +</span></span>
+<span id="cb28-145"><a href="#cb28-145" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() +</span></span>
+<span id="cb28-146"><a href="#cb28-146" aria-hidden="true" tabindex="-1"></a><span class="in">  labs(title = "Skills") +</span></span>
+<span id="cb28-147"><a href="#cb28-147" aria-hidden="true" tabindex="-1"></a><span class="in">  theme(axis.text.x = element_text(angle = 45, hjust = 1))</span></span>
+<span id="cb28-148"><a href="#cb28-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-149"><a href="#cb28-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-150"><a href="#cb28-150" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-151"><a href="#cb28-151" aria-hidden="true" tabindex="-1"></a>Bueno las variables físicas (<span class="in">`age`</span>, <span class="in">`height`</span> y <span class="in">`weight`</span>) relativamente normales, aunque hay algunos outliers sobre todo en cuanto al peso de los jugadores.  </span>
+<span id="cb28-152"><a href="#cb28-152" aria-hidden="true" tabindex="-1"></a>Las variables de habilidad están escaladas MinMax porque van de 0 a 100.  En general hay algunas habilidades en la que hay algunos outliers de jugadores malos (por ejemplo <span class="in">`agility`</span>, <span class="in">`stamina`</span>), </span>
+<span id="cb28-153"><a href="#cb28-153" aria-hidden="true" tabindex="-1"></a>mientras que otras tiene outliers por jugadores buenos, como <span class="in">`composure`</span>. Esto ultimo para el caso de <span class="in">`gk_kicking`</span> es notorio, porque la mayoria no son arqueros. </span>
+<span id="cb28-154"><a href="#cb28-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-155"><a href="#cb28-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-156"><a href="#cb28-156" aria-hidden="true" tabindex="-1"></a><span class="fu"># PCA e interpretación.</span></span>
+<span id="cb28-157"><a href="#cb28-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-158"><a href="#cb28-158" aria-hidden="true" tabindex="-1"></a><span class="fu">### Realice el PCA sobre las variables seleccionadas. ¿Con cuantas componentes decide quedarse luego de la reduccion de dimensionalidad? </span></span>
+<span id="cb28-159"><a href="#cb28-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-160"><a href="#cb28-160" aria-hidden="true" tabindex="-1"></a>Combino los datos de habilidad y físico y uso matriz de correlación</span>
+<span id="cb28-161"><a href="#cb28-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-162"><a href="#cb28-162" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r cor_mat}</span></span>
+<span id="cb28-163"><a href="#cb28-163" aria-hidden="true" tabindex="-1"></a><span class="in">pca &lt;- prcomp(numericas_reducido,</span></span>
+<span id="cb28-164"><a href="#cb28-164" aria-hidden="true" tabindex="-1"></a><span class="in">              scale = TRUE)</span></span>
+<span id="cb28-165"><a href="#cb28-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-166"><a href="#cb28-166" aria-hidden="true" tabindex="-1"></a><span class="in">round(pca$rotation,2) |&gt; knitr::kable(format = "html") |&gt; </span></span>
+<span id="cb28-167"><a href="#cb28-167" aria-hidden="true" tabindex="-1"></a><span class="in">  kable_styling() </span></span>
+<span id="cb28-168"><a href="#cb28-168" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-169"><a href="#cb28-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-170"><a href="#cb28-170" aria-hidden="true" tabindex="-1"></a>Para ver con cuantas me quedo voy a ver primero la varianza explicada</span>
+<span id="cb28-171"><a href="#cb28-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-172"><a href="#cb28-172" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r varianza_explicada}</span></span>
+<span id="cb28-173"><a href="#cb28-173" aria-hidden="true" tabindex="-1"></a><span class="in">prop_varianza &lt;- pca$sdev^2 / sum(pca$sdev^2)</span></span>
+<span id="cb28-174"><a href="#cb28-174" aria-hidden="true" tabindex="-1"></a><span class="in">prop_varianza_acum &lt;- cumsum(prop_varianza)</span></span>
+<span id="cb28-175"><a href="#cb28-175" aria-hidden="true" tabindex="-1"></a><span class="in">ggplot(data = data.frame(prop_varianza_acum, pc = 1:24),</span></span>
+<span id="cb28-176"><a href="#cb28-176" aria-hidden="true" tabindex="-1"></a><span class="in">       aes(x = pc, y = prop_varianza_acum, group = 1)) +</span></span>
+<span id="cb28-177"><a href="#cb28-177" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb28-178"><a href="#cb28-178" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_line() +</span></span>
+<span id="cb28-179"><a href="#cb28-179" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() +</span></span>
+<span id="cb28-180"><a href="#cb28-180" aria-hidden="true" tabindex="-1"></a><span class="in">  labs(x = "Componente principal",</span></span>
+<span id="cb28-181"><a href="#cb28-181" aria-hidden="true" tabindex="-1"></a><span class="in">       y = "Prop. varianza explicada acumulada") +</span></span>
+<span id="cb28-182"><a href="#cb28-182" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_continuous(breaks = seq(0, 1, 0.1))</span></span>
+<span id="cb28-183"><a href="#cb28-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-184"><a href="#cb28-184" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-185"><a href="#cb28-185" aria-hidden="true" tabindex="-1"></a>Bueno con las primeras 4 componentes tengo más del 80% de varianza explicada, no está mal.  Además si me quedo con las primeras 4 cumplo el criterio de Kaiser ($\lambda_4 = 1.12, \lambda_5 = 0.99$).  </span>
+<span id="cb28-186"><a href="#cb28-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-187"><a href="#cb28-187" aria-hidden="true" tabindex="-1"></a><span class="fu">### Interprete las cargas factoriales de las primeras dos componentes principales. ¿Qué atributos de los jugadores están más representados en cada componente? Mostrar el biplot del PCA realizado.</span></span>
+<span id="cb28-188"><a href="#cb28-188" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r cargas, fig.width=15, fig.height=10}</span></span>
+<span id="cb28-189"><a href="#cb28-189" aria-hidden="true" tabindex="-1"></a><span class="in"># Crear data frame con ambas cargas y pasar a formato largo</span></span>
+<span id="cb28-190"><a href="#cb28-190" aria-hidden="true" tabindex="-1"></a><span class="in">cargas_long &lt;- data.frame(</span></span>
+<span id="cb28-191"><a href="#cb28-191" aria-hidden="true" tabindex="-1"></a><span class="in">  variable = colnames(numericas_reducido),</span></span>
+<span id="cb28-192"><a href="#cb28-192" aria-hidden="true" tabindex="-1"></a><span class="in">  PC1 = pca$rotation[, 1],</span></span>
+<span id="cb28-193"><a href="#cb28-193" aria-hidden="true" tabindex="-1"></a><span class="in">  PC2 = pca$rotation[, 2]</span></span>
+<span id="cb28-194"><a href="#cb28-194" aria-hidden="true" tabindex="-1"></a><span class="in">) %&gt;%</span></span>
+<span id="cb28-195"><a href="#cb28-195" aria-hidden="true" tabindex="-1"></a><span class="in">  pivot_longer(cols = c(PC1, PC2), names_to = "componente", values_to = "carga")</span></span>
+<span id="cb28-196"><a href="#cb28-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-197"><a href="#cb28-197" aria-hidden="true" tabindex="-1"></a><span class="in"># Gráfico de barras comparando PC1 y PC2</span></span>
+<span id="cb28-198"><a href="#cb28-198" aria-hidden="true" tabindex="-1"></a><span class="in">ggplot(cargas_long, aes(x = variable, y = carga, fill = componente)) +</span></span>
+<span id="cb28-199"><a href="#cb28-199" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_bar(stat = "identity", position = "dodge", width = 0.6) +</span></span>
+<span id="cb28-200"><a href="#cb28-200" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_fill_manual(values = c("PC1" = "royalblue", "PC2" = "tomato")) +</span></span>
+<span id="cb28-201"><a href="#cb28-201" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("Variables") + ylab("Carga") +</span></span>
+<span id="cb28-202"><a href="#cb28-202" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() +</span></span>
+<span id="cb28-203"><a href="#cb28-203" aria-hidden="true" tabindex="-1"></a><span class="in">  theme(axis.text.x = element_text(angle = 45, hjust = 1))</span></span>
+<span id="cb28-204"><a href="#cb28-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-205"><a href="#cb28-205" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-206"><a href="#cb28-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-207"><a href="#cb28-207" aria-hidden="true" tabindex="-1"></a>Como se ve en el diagrama, la PC1 tiene contribución parecida de todas las habilidades. Las que menos contribuyen a la componente 1 son las que tienen que ver con las características físicas, estas son, <span class="in">`age`</span>, <span class="in">`strenght`</span>, <span class="in">`jumping`</span> y luego en menor medida <span class="in">`weight`</span> y <span class="in">`height`</span>. Estos atributos de hecho son los que contribuyen mayormente a la componente 2.   </span>
+<span id="cb28-208"><a href="#cb28-208" aria-hidden="true" tabindex="-1"></a>Pareciera ser que la componente 1 está compuesta más por los skills que por los aspectos físicos y para la componente 2 es lo opuesto. </span>
+<span id="cb28-209"><a href="#cb28-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-210"><a href="#cb28-210" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r biplot}</span></span>
+<span id="cb28-211"><a href="#cb28-211" aria-hidden="true" tabindex="-1"></a><span class="in">autoplot(pca, </span></span>
+<span id="cb28-212"><a href="#cb28-212" aria-hidden="true" tabindex="-1"></a><span class="in">         data = numericas_reducido, </span></span>
+<span id="cb28-213"><a href="#cb28-213" aria-hidden="true" tabindex="-1"></a><span class="in">         loadings = TRUE, </span></span>
+<span id="cb28-214"><a href="#cb28-214" aria-hidden="true" tabindex="-1"></a><span class="in">         loadings.colour = 'lightblue',</span></span>
+<span id="cb28-215"><a href="#cb28-215" aria-hidden="true" tabindex="-1"></a><span class="in">         loadings.label = TRUE, </span></span>
+<span id="cb28-216"><a href="#cb28-216" aria-hidden="true" tabindex="-1"></a><span class="in">         loadings.label.size = 5)</span></span>
+<span id="cb28-217"><a href="#cb28-217" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-218"><a href="#cb28-218" aria-hidden="true" tabindex="-1"></a>Aca podemos ver un poco más de lo que veníamos destacando, pero agregando que la dirección entre <span class="in">`strength`</span> y <span class="in">`height`</span>-<span class="in">`weight`</span> no son las mismas. </span>
+<span id="cb28-219"><a href="#cb28-219" aria-hidden="true" tabindex="-1"></a>Es decir, si bien contribuyen poco a la componente 1 y más a la 2, contribuyen de distinta manera.  </span>
+<span id="cb28-220"><a href="#cb28-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-221"><a href="#cb28-221" aria-hidden="true" tabindex="-1"></a><span class="fu">### Identifique si hay agrupamientos naturales de jugadores en función de las características seleccionadas. Interprete y concluya.</span></span>
+<span id="cb28-222"><a href="#cb28-222" aria-hidden="true" tabindex="-1"></a>Siguiendo con el biplot podemos ver que el agrupamiento natural más relevante es si es arquero o no, segun u habilidad <span class="in">`gk_kicking`</span>.  </span>
+<span id="cb28-223"><a href="#cb28-223" aria-hidden="true" tabindex="-1"></a>Quizá también podemos identificar un agrupamiento por Alturay peso.</span>
+<span id="cb28-224"><a href="#cb28-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-225"><a href="#cb28-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-226"><a href="#cb28-226" aria-hidden="true" tabindex="-1"></a><span class="fu">### Elegir una técnica de PCA robusto y aplicarla sobre la base de datos. Compare los resultados con los obtenidos anteriormente. Concluir.</span></span>
+<span id="cb28-227"><a href="#cb28-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-228"><a href="#cb28-228" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r}</span></span>
+<span id="cb28-229"><a href="#cb28-229" aria-hidden="true" tabindex="-1"></a><span class="in">pca_mcd &lt;-princomp(numericas_reducido, </span></span>
+<span id="cb28-230"><a href="#cb28-230" aria-hidden="true" tabindex="-1"></a><span class="in">                   cor=TRUE,</span></span>
+<span id="cb28-231"><a href="#cb28-231" aria-hidden="true" tabindex="-1"></a><span class="in">                   scores=TRUE,</span></span>
+<span id="cb28-232"><a href="#cb28-232" aria-hidden="true" tabindex="-1"></a><span class="in">                   covmat=MASS::cov.mcd(numericas_reducido))#se especifica MCD</span></span>
+<span id="cb28-233"><a href="#cb28-233" aria-hidden="true" tabindex="-1"></a><span class="in">```</span> </span>
+<span id="cb28-234"><a href="#cb28-234" aria-hidden="true" tabindex="-1"></a><span class="in">``` {r}</span></span>
+<span id="cb28-235"><a href="#cb28-235" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggpubr)</span></span>
+<span id="cb28-236"><a href="#cb28-236" aria-hidden="true" tabindex="-1"></a><span class="in">library(factoextra)</span></span>
+<span id="cb28-237"><a href="#cb28-237" aria-hidden="true" tabindex="-1"></a><span class="in">par(mfrow=c(2,1))</span></span>
+<span id="cb28-238"><a href="#cb28-238" aria-hidden="true" tabindex="-1"></a><span class="in">p1 &lt;-fviz_eig(pca_mcd, ncp =5, addlabels = TRUE, main="MCD")</span></span>
+<span id="cb28-239"><a href="#cb28-239" aria-hidden="true" tabindex="-1"></a><span class="in">p2&lt;- fviz_eig(pca, ncp =5, addlabels = TRUE, main="No Robusto")</span></span>
+<span id="cb28-240"><a href="#cb28-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-241"><a href="#cb28-241" aria-hidden="true" tabindex="-1"></a><span class="in">ggarrange(p1,p2, nrow = 1, ncol = 2)</span></span>
+<span id="cb28-242"><a href="#cb28-242" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-243"><a href="#cb28-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-244"><a href="#cb28-244" aria-hidden="true" tabindex="-1"></a>Esto parece indicar que las componentes se reparten un poco más la variabilidad que la no robusta.  </span>
 </code><button title="Copiar al portapapeles" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
